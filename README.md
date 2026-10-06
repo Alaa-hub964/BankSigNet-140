@@ -108,10 +108,13 @@ Results from our paper (open-set signer-disjoint evaluation, mean ± std over 3 
 
 | Method | ACC (%) | EER (%) | AUC |
 |---|---|---|---|
-| MobileNetV2 Siamese | 60.9 | — | — |
-| ResNet50 + Focal Loss | 41.0 | — | — |
-| CNN + Autoencoder | 48.4 | — | — |
+| MobileNetV2 Siamese (Reddy 2025) | 60.9 | — | — |
+| ResNet50 + Focal Loss (Xiao 2024) | 41.0 | — | — |
+| CNN + Autoencoder (Harinadh 2025) | 48.4 | — | — |
+| IGCN+RL (Priya 2025) | 57.1† | — | — |
 | **MSFV-Net (ours)** | **75.8 ± 3.2** | **24.25 ± 3.11** | **0.879 ± 0.039** |
+
+† Evaluated under open-set person-level protocol; original paper reports 94.11% on BHSig260-Hindi (plain paper).
 
 Per-script accuracy:
 
@@ -122,6 +125,8 @@ Per-script accuracy:
 | Arabic (n=49) | 72.8 | 30.6 | 0.803 |
 
 ---
+
+
 
 ## Usage
 
@@ -151,7 +156,7 @@ If you use BankSigNet-140 in your research, please cite:
 @article{alowaidi2026msfvnet,
   title   = {MSFV-Net: Explainable Multi-Script Offline Signature Verification
              on Real Bank Cheque Data},
-  author  = {Alowaidi, Alaa and Kumar Pateriya, Pushpendra },
+  author  = {Alowaidi, Alaa and Kumar Pateriya, Pushpendra and Mahajan, Divya},
   journal = {International Journal on Document Analysis and Recognition},
   year    = {2026},
   note    = {Under review}
