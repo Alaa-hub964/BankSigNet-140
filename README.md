@@ -207,7 +207,7 @@ If you use BankSigNet-140 or MSFV-Net in your research, please cite:
 @article{alowaidi2026msfvnet,
   title   = { MSFV-Net for Multi-Script Bank Cheque Signature Verification
              },
-  author  = {Alowaidi, Alaa and Kumar Pateriya, Pushpendra and Mahajan, Divya},
+  author  = { Alaa Alowaidi, and Pushpendra Kumar Pateriya },
   journal = {Al-Khwarizmi Engineering Journal},
   year    = {2026},
   note    = {Under review}
