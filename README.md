@@ -29,11 +29,19 @@
 - **Real bank cheque backgrounds** — signatures appear on printed cheque paper with pre-printed fields, borders, bank logos, and alphanumeric text. No existing public dataset provides this.
 - **Three scripts simultaneously** — Arabic, English (Latin), and Hindi (Devanagari) in a single unified benchmark.
 - **Skilled forgeries** — forgers viewed the target signature for 60 seconds before producing imitations from memory. Tracing was not permitted.
-- **Reproducible splits** — fixed signer-disjoint train/val/test partition included.
+- **Reproducible splits** — fixed signer-disjoint train/val/test partition included (`splits_v12_final.pkl`).
 
 ---
 
-## Dataset Structure
+## Dataset
+
+The full dataset is included in this repository as `extracted.zip`.
+
+```bash
+unzip extracted.zip
+```
+
+### Structure
 
 ```
 extracted/
@@ -102,6 +110,62 @@ test_ids  = list(splits['test_gen'].keys())   # 21 signers (held out)
 
 ---
 
+## MSFV-Net Model
+
+MSFV-Net is a multi-script forgery verification network built on a Siamese ResNet50 backbone. Key components:
+
+- **Forged-aware dual loss** — combines triplet loss with binary cross-entropy
+- **Multi-reference signature gallery** — query compared against multiple genuine references per signer
+- **Script-balanced batch sampling** — equal representation of Arabic, English, and Hindi in each batch
+- **Synthetic background augmentation** — simulates cheque background variation during training
+
+Model definition: [`model/msfvnet.py`](model/msfvnet.py)
+
+---
+
+## Usage
+
+### Installation
+
+```bash
+pip install -r requirements.txt
+```
+
+### Training
+
+```bash
+python train.py \
+    --data_root extracted \
+    --splits    splits_v12_final.pkl \
+    --save_path verifier_msfv.pth \
+    --seed      42
+```
+
+### Evaluation
+
+```bash
+python evaluate.py \
+    --checkpoint verifier_msfv.pth \
+    --data_root  extracted \
+    --splits     splits_v12_final.pkl \
+    --seeds      42 123 456
+```
+
+Reports ACC, EER, FAR, FRR, and AUC overall and per script.
+
+### Explainability (Difference GradCAM)
+
+```bash
+python xai/difference_gradcam.py \
+    --checkpoint verifier_msfv.pth \
+    --data_root  extracted \
+    --splits     splits_v12_final.pkl
+```
+
+Computes Difference GradCAM heatmaps and Deletion/Insertion AUC faithfulness metrics.
+
+---
+
 ## Benchmark Results
 
 Results from our paper (open-set signer-disjoint evaluation, mean ± std over 3 seeds):
@@ -112,52 +176,39 @@ Results from our paper (open-set signer-disjoint evaluation, mean ± std over 3 
 | ResNet50 + Focal Loss (Xiao 2024) | 41.0 | — | — |
 | CNN + Autoencoder (Harinadh 2025) | 48.4 | — | — |
 | IGCN+RL (Priya 2025) | 57.1† | — | — |
-| **MSFV-Net (ours)** | **75.8 ± 3.2** | **24.25 ± 3.11** | **0.879 ± 0.039** |
+| **MSFV-Net (ours)** | **73.56 ± 2.16** | **26.07 ± 1.45** | **0.810 ± 0.017** |
 
 † Evaluated under open-set person-level protocol; original paper reports 94.11% on BHSig260-Hindi (plain paper).
 
-Per-script accuracy:
+Per-script accuracy on BankSigNet-140:
 
-| Script | ACC (%) | EER (%) | AUC |
-|---|---|---|---|
-| Hindi (n=45) | 90.9 | 3.9 | 0.993 |
-| English (n=46) | 74.2 | 18.2 | 0.924 |
-| Arabic (n=49) | 72.8 | 30.6 | 0.803 |
+| Script | ACC (%) |
+|---|---|
+| Hindi (n=45) | 88.6 |
+| English (n=46) | 69.2 |
+| Arabic (n=49) | 66.5 |
+| **Mean** | **73.56** |
 
----
+Cross-dataset result on BHSig260-Hindi (standard benchmark):
 
-
-
-## Usage
-
-```python
-from pathlib import Path
-from PIL import Image
-
-ROOT = Path('extracted')
-
-def load_signer(person_id):
-    genuine = sorted((ROOT / 'genuine' / person_id).glob('*.png'))
-    forged  = sorted((ROOT / 'forged'  / person_id).glob('*.png'))
-    return genuine, forged
-
-# Example
-genuine, forged = load_signer('H001')
-img = Image.open(genuine[0])
-```
+| Method | ACC (%) |
+|---|---|
+| SigNet | 84.64 |
+| IDN | 93.04 |
+| **MSFV-Net (ours)** | **93.15** |
 
 ---
 
 ## Citation
 
-If you use BankSigNet-140 in your research, please cite:
+If you use BankSigNet-140 or MSFV-Net in your research, please cite:
 
 ```bibtex
 @article{alowaidi2026msfvnet,
-  title   = {MSFV-Net: Explainable Multi-Script Offline Signature Verification
-             on Real Bank Cheque Data},
+  title   = { MSFV-Net for Multi-Script Bank Cheque Signature Verification
+             },
   author  = {Alowaidi, Alaa and Kumar Pateriya, Pushpendra and Mahajan, Divya},
-  journal = {International Journal on Document Analysis and Recognition},
+  journal = {Al-Khwarizmi Engineering Journal},
   year    = {2026},
   note    = {Under review}
 }
@@ -174,5 +225,5 @@ You are free to share and adapt the dataset for any purpose, provided appropriat
 
 ## Contact
 
-For questions about the dataset, please open a GitHub issue or contact:
+For questions about the dataset or model, please open a GitHub issue or contact:
 **abd94057@gmail.com**
