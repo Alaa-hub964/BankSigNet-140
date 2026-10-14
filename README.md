@@ -124,6 +124,7 @@ Model definition: [`model/msfvnet.py`](model/msfvnet.py)
 ---
 
 ## Usage
+**Pretrained checkpoint:** [Download from Hugging Face](https://huggingface.co/AlaaAlowaidi/BankSigNet-140)
 
 ### Installation
 
